@@ -1,40 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Allure Moema — Sistema de Precificação
 
-## Getting Started
+Admin system para precificação dinâmica dos apartamentos do Allure Moema, baseado em BAR levels com dados históricos da planilha 2023-2024.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (Pages Router) + TypeScript
+- **Tailwind CSS 4**
+- **Firebase Auth + Admin SDK** (Firestore)
+- **Lucide React** icons
+- Design: paleta Allure Moema (cream/navy/gold) + layout NYO Admin
+
+## Setup
+
+### 1. Variáveis de Ambiente
+
+Copie `.env.example` para `.env.local` e preencha:
+
+```bash
+cp .env.example .env.local
+```
+
+Campos necessários:
+- `FIREBASE_PROJECT_ID` — ID do projeto Firebase
+- `FIREBASE_CLIENT_EMAIL` — email da service account
+- `FIREBASE_PRIVATE_KEY` — chave privada da service account
+- `FIREBASE_API_KEY` — chave de API Firebase (para login server-side)
+- `NEXT_PUBLIC_FIREBASE_*` — configuração do SDK cliente
+- `SESSION_SECRET` — mínimo 32 caracteres para encriptação AES-256-GCM
+
+### 2. Instalar dependências
+
+```bash
+npm install
+```
+
+### 3. Iniciar o servidor
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse: http://localhost:3000
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Populando o Firestore
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Execute os scripts de seed após configurar o `.env.local`:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+```bash
+# Popular todos (recomendado na primeira vez)
+npm run seed:all
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Ou individualmente:
+npm run seed:rooms        # 6 tipologias de quartos
+npm run seed:bar          # Tabela BAR completa (extraída da planilha TARIFÁRIO)
+npm run seed:historical   # 357 dias do calendário 2023-2024 (BAR diário)
+npm run seed:competitors  # 3 amostras históricas de concorrentes
+```
 
-## Learn More
+## Estrutura do Projeto
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── pages/
+│   ├── login.tsx              # Autenticação
+│   ├── dashboard.tsx          # Visão geral de tarifas + 7 dias
+│   ├── calendario.tsx         # Calendário mensal com color-coding BAR
+│   ├── configuracoes.tsx      # CRUD de períodos BAR + tabela de tarifas
+│   ├── concorrentes.tsx       # Análise de concorrentes + amostras
+│   └── api/
+│       ├── auth/              # login, logout, me
+│       ├── pricing/current    # Calcula preços por data
+│       ├── bar-periods/       # CRUD de períodos BAR
+│       └── competitors/       # Amostras de concorrentes
+├── lib/
+│   ├── pricing-engine.ts      # Lógica BAR → preço final
+│   ├── firebase-admin.ts      # SDK Admin (server)
+│   ├── firebase-client.ts     # SDK Client (browser)
+│   └── session.ts             # Cookie AES-256-GCM + auth helpers
+├── data/
+│   ├── rooms.ts               # 6 tipologias (fallback estático)
+│   ├── bar-table.ts           # Tabela BAR completa (-9 a 17) por quarto
+│   └── historical-calendar.ts # 357 dias 2023-2024 com BAR + preços
+└── types/index.ts             # Tipos TypeScript
+scripts/
+├── seed-rooms.ts
+├── seed-bar-table.ts
+├── seed-historical.ts
+└── seed-competitors.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## Coleções Firestore
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Coleção | Descrição |
+|---------|-----------|
+| `/rooms/{roomId}` | 6 tipologias de quartos |
+| `/bar_rates/{roomId}` | Tabela BAR por quarto (todos os níveis) |
+| `/bar_periods/{id}` | Períodos configurados manualmente pelo admin |
+| `/historical_data/{YYYYMMDD}` | Calendário histórico 2023-2024 |
+| `/competitor_samples/{id}` | Amostras de preços da concorrência |
+| `/users/{uid}` | Usuários com role admin/viewer |
 
-## Deploy on Vercel
+## Lógica de Precificação (BAR)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+O sistema determina o nível BAR para cada data em 3 camadas:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+1. **Firestore `bar_periods`** — períodos configurados manualmente (maior prioridade)
+2. **`historical_data`** — sazonalidade inferida do calendário 2023-2024
+3. **Padrão BAR 5** — fallback se não houver histórico
+
+Escala BAR: 1 (tarifa mais alta, alta temporada) → 10 (tarifa mais baixa, baixa temporada).  
+BAR 5 é a tarifa-base.
+
+## Concorrentes Identificados
+
+Mercure SP Moema, Wyndham, EstanPlaza, Intercity, Comfort Ibirapuera, Ibis SP, Slaviero SP Moema, Mercure SP Ibirapuera, Melià Ibirapuera, Mercure SP Times Square, TSUE The Place Flats.
+
+> Integração Booking.com planejada para próxima versão.

@@ -1,0 +1,182 @@
+import type { CompetitorSample, CompetitorUrl } from "@/types";
+
+/**
+ * 19 unique competitor hotels monitored on Booking.com.
+ * URLs are canonical (label/sid params stripped).
+ */
+export const COMPETITOR_URLS: CompetitorUrl[] = [
+  {
+    id: "charlie-for-you-moema",
+    name: "Charlie For You Moema",
+    bookingUrl: "https://www.booking.com/hotel/br/charlie-for-you-moema-soft-opening.pt-br.html",
+    active: true,
+  },
+  {
+    id: "quality-moema",
+    name: "Quality Moema",
+    bookingUrl: "https://www.booking.com/hotel/br/quality-moema.pt-br.html",
+    active: true,
+  },
+  {
+    id: "iconyc-charlie",
+    name: "Iconyc by Charlie",
+    bookingUrl: "https://www.booking.com/hotel/br/iconyc-charlie.pt-br.html",
+    active: true,
+  },
+  {
+    id: "estanplaza-ibirapuera",
+    name: "EstanPlaza Ibirapuera",
+    bookingUrl: "https://www.booking.com/hotel/br/estanplaza-ibirapuera.pt-br.html",
+    active: true,
+  },
+  {
+    id: "slaviero-moema",
+    name: "Slaviero Moema SP",
+    bookingUrl: "https://www.booking.com/hotel/br/slaviero-moema-sao-paulo-09.pt-br.html",
+    active: true,
+  },
+  {
+    id: "premium-flats-berrini",
+    name: "Premium Flats Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/premium-flats-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "comfort-ibirapuera",
+    name: "Comfort Ibirapuera",
+    bookingUrl: "https://www.booking.com/hotel/br/flat-privativo-comfort-ibirapuera.pt-br.html",
+    active: true,
+  },
+  {
+    id: "bistu-hostel",
+    name: "Bistu Hostel",
+    bookingUrl: "https://www.booking.com/hotel/br/bistu-amp-hostel.pt-br.html",
+    active: true,
+  },
+  {
+    id: "tsue-the-palace-flat",
+    name: "TSUE The Palace Flat",
+    bookingUrl: "https://www.booking.com/hotel/br/tsue-the-palace-flat.pt-br.html",
+    active: true,
+  },
+  {
+    id: "charlie-on-the-parc",
+    name: "Charlie on the Parc Ibirapuera",
+    bookingUrl: "https://www.booking.com/hotel/br/charlie-on-the-parc-ibirapuera.pt-br.html",
+    active: true,
+  },
+  {
+    id: "ez-moema",
+    name: "EZ Moema",
+    bookingUrl: "https://www.booking.com/hotel/br/ez-moema.pt-br.html",
+    active: true,
+  },
+  {
+    id: "charlie-in-itaim",
+    name: "Charlie in Itaim",
+    bookingUrl: "https://www.booking.com/hotel/br/charlie-in-itaim.pt-br.html",
+    active: true,
+  },
+  {
+    id: "slaviero-essencial-ibirapuera",
+    name: "Slaviero Essencial Ibirapuera",
+    bookingUrl: "https://www.booking.com/hotel/br/slaviero-essencial-sao-paulo-ibirapuera-sao-paulo1.pt-br.html",
+    active: true,
+  },
+  {
+    id: "ibis-ibirapuera",
+    name: "ibis SP Ibirapuera",
+    bookingUrl: "https://www.booking.com/hotel/br/ibis-sao-paulo-ibirapuera.pt-br.html",
+    active: true,
+  },
+  {
+    id: "merak",
+    name: "Merak",
+    bookingUrl: "https://www.booking.com/hotel/br/merak.pt-br.html",
+    active: true,
+  },
+  {
+    id: "lexy-vila-mariana",
+    name: "Lexy Vila Mariana",
+    bookingUrl: "https://www.booking.com/hotel/br/lexy-vila-mariana.pt-br.html",
+    active: true,
+  },
+  {
+    id: "gran-chevalier",
+    name: "Gran Chevalier",
+    bookingUrl: "https://www.booking.com/hotel/br/gran-chevalier.pt-br.html",
+    active: true,
+  },
+  {
+    id: "wyndham-ibirapuera",
+    name: "Wyndham Ibirapuera Convention Plaza",
+    bookingUrl: "https://www.booking.com/hotel/br/wyndham-saopaulo-ibirapuera-convention-plaza.pt-br.html",
+    active: true,
+  },
+  {
+    id: "goodstay",
+    name: "Goodstay",
+    bookingUrl: "https://www.booking.com/hotel/br/goodstay.pt-br.html",
+    active: true,
+  },
+];
+
+export const COMPETITOR_SAMPLES: CompetitorSample[] = [
+  {
+    id: "sample-2023-07-25",
+    date: "2023-07-25",
+    notes: "Amostra de alta temporada (julho 2023)",
+    competitors: [
+      { name: "Mercure SP Moema", sqm: 35, price1Pax: 699, price2Pax: 769, fee: 35, finalPrice1Pax: 734, finalPrice2Pax: 804 },
+      { name: "Wyndham", sqm: 28, price1Pax: 661, price2Pax: 720, fee: 0, finalPrice1Pax: 661, finalPrice2Pax: 720 },
+      { name: "EstanPlaza", sqm: 25, price1Pax: 567, price2Pax: 643, fee: 0, finalPrice1Pax: 567, finalPrice2Pax: 643 },
+      { name: "Intercity", sqm: 27, price1Pax: 683, price2Pax: 735, fee: 0, finalPrice1Pax: 683, finalPrice2Pax: 735 },
+      { name: "Comfort Ibirapuera", sqm: 29, price1Pax: 521, price2Pax: 566, fee: 0, finalPrice1Pax: 521, finalPrice2Pax: 566 },
+      { name: "Ibis SP", sqm: 15, price1Pax: 525, price2Pax: 595, fee: 24, finalPrice1Pax: 549, finalPrice2Pax: 619 },
+      { name: "Slaviero SP Moema", sqm: 30, price1Pax: 519, price2Pax: 582, fee: 0, finalPrice1Pax: 519, finalPrice2Pax: 582 },
+      { name: "Mercure SP Ibirapuera", sqm: 32, price1Pax: 666, price2Pax: 741, fee: 37, finalPrice1Pax: 703, finalPrice2Pax: 778 },
+      { name: "Melià Ibirapuera", sqm: 30, price1Pax: 0, price2Pax: 0, fee: 0, finalPrice1Pax: 0, finalPrice2Pax: 0 },
+      { name: "Mercure SP Times Square", sqm: 32, price1Pax: 761, price2Pax: 836, fee: 38, finalPrice1Pax: 799, finalPrice2Pax: 874 },
+      { name: "TSUE The Place Flats", sqm: 37, price1Pax: 561, price2Pax: 583, fee: 0, finalPrice1Pax: 561, finalPrice2Pax: 583 },
+    ],
+    createdAt: new Date("2023-07-25").toISOString(),
+  },
+  {
+    id: "sample-2023-08-25",
+    date: "2023-08-25",
+    notes: "Amostra de baixa temporada (agosto 2023)",
+    competitors: [
+      { name: "Mercure SP Moema", sqm: 35, price1Pax: 390, price2Pax: 457, fee: 23, finalPrice1Pax: 413, finalPrice2Pax: 480 },
+      { name: "Wyndham", sqm: 28, price1Pax: 426, price2Pax: 484, fee: 0, finalPrice1Pax: 426, finalPrice2Pax: 484 },
+      { name: "EstanPlaza", sqm: 25, price1Pax: 406, price2Pax: 482, fee: 0, finalPrice1Pax: 406, finalPrice2Pax: 482 },
+      { name: "Intercity", sqm: 27, price1Pax: 392, price2Pax: 454, fee: 0, finalPrice1Pax: 392, finalPrice2Pax: 454 },
+      { name: "Comfort Ibirapuera", sqm: 29, price1Pax: 438, price2Pax: 485, fee: 0, finalPrice1Pax: 438, finalPrice2Pax: 485 },
+      { name: "Ibis SP", sqm: 15, price1Pax: 329, price2Pax: 389, fee: 19, finalPrice1Pax: 348, finalPrice2Pax: 408 },
+      { name: "Slaviero SP Moema", sqm: 30, price1Pax: 400, price2Pax: 448, fee: 0, finalPrice1Pax: 400, finalPrice2Pax: 448 },
+      { name: "Mercure SP Ibirapuera", sqm: 32, price1Pax: 428, price2Pax: 503, fee: 25, finalPrice1Pax: 453, finalPrice2Pax: 528 },
+      { name: "Melià Ibirapuera", sqm: 30, price1Pax: 0, price2Pax: 0, fee: 0, finalPrice1Pax: 0, finalPrice2Pax: 0 },
+      { name: "Mercure SP Times Square", sqm: 32, price1Pax: 390, price2Pax: 462, fee: 23, finalPrice1Pax: 413, finalPrice2Pax: 485 },
+      { name: "TSUE The Place Flats", sqm: 37, price1Pax: 593, price2Pax: 616, fee: 0, finalPrice1Pax: 593, finalPrice2Pax: 616 },
+    ],
+    createdAt: new Date("2023-08-25").toISOString(),
+  },
+  {
+    id: "sample-2023-12-25",
+    date: "2023-12-25",
+    notes: "Amostra de dezembro 2023 (alta temporada)",
+    competitors: [
+      { name: "Mercure SP Moema", sqm: 35, price1Pax: 429, price2Pax: 499, fee: 25, finalPrice1Pax: 454, finalPrice2Pax: 524 },
+      { name: "Wyndham", sqm: 28, price1Pax: 634, price2Pax: 712, fee: 0, finalPrice1Pax: 634, finalPrice2Pax: 712 },
+      { name: "EstanPlaza", sqm: 25, price1Pax: 378, price2Pax: 454, fee: 0, finalPrice1Pax: 378, finalPrice2Pax: 454 },
+      { name: "Intercity", sqm: 27, price1Pax: 364, price2Pax: 425, fee: 0, finalPrice1Pax: 364, finalPrice2Pax: 425 },
+      { name: "Comfort Ibirapuera", sqm: 29, price1Pax: 401, price2Pax: 448, fee: 0, finalPrice1Pax: 401, finalPrice2Pax: 448 },
+      { name: "Ibis SP", sqm: 15, price1Pax: 329, price2Pax: 389, fee: 16, finalPrice1Pax: 345, finalPrice2Pax: 405 },
+      { name: "Slaviero SP Moema", sqm: 30, price1Pax: 417, price2Pax: 468, fee: 0, finalPrice1Pax: 417, finalPrice2Pax: 468 },
+      { name: "Mercure SP Ibirapuera", sqm: 32, price1Pax: 428, price2Pax: 503, fee: 21, finalPrice1Pax: 449, finalPrice2Pax: 524 },
+      { name: "Melià Ibirapuera", sqm: 30, price1Pax: 474, price2Pax: 546, fee: 0, finalPrice1Pax: 474, finalPrice2Pax: 546 },
+      { name: "Mercure SP Times Square", sqm: 32, price1Pax: 428, price2Pax: 503, fee: 25, finalPrice1Pax: 453, finalPrice2Pax: 528 },
+      { name: "TSUE The Place Flats", sqm: 37, price1Pax: 562, price2Pax: 584, fee: 0, finalPrice1Pax: 562, finalPrice2Pax: 584 },
+    ],
+    createdAt: new Date("2023-12-25").toISOString(),
+  },
+];
