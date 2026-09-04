@@ -1,63 +1,39 @@
 /**
  * POST /api/competitors/scrape
- *
- * Triggers the Playwright scraper for a single date or a full period.
- * Requires admin session.
- *
- * Body (single date):
- *   { checkin: "YYYY-MM-DD", checkout: "YYYY-MM-DD", hotel?: string, adults?: 1|2 }
- *
- * Body (period):
- *   { periodStart: "YYYY-MM-DD", periodEnd: "YYYY-MM-DD", step?: number,
- *     weekendsOnly?: boolean, hotel?: string, adults?: 1|2 }
- *
- * NOTE: Only works on a self-hosted Node.js server.
- * Returns 503 on Vercel/serverless with CLI instructions.
+ * Queues a scrape job in Firestore for the VPS worker.
+ * Returns { jobId } — UI polls GET /api/competitors/scrape-jobs/[id].
  */
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { spawn } from "child_process";
-import path from "path";
 import { requireAdmin } from "@/lib/session";
-
-const IS_SERVERLESS =
-  !!process.env.VERCEL ||
-  !!process.env.AWS_LAMBDA_FUNCTION_NAME ||
-  !!process.env.CF_PAGES;
+import { getAdminFirestore } from "@/lib/firebase-admin";
+import { estimateScrapeWorkload } from "@/lib/scrape-estimate";
+import type { ScrapeJob, ScrapeJobParams } from "@/types";
 
 const DEMO_MODE = !process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const admin = await requireAdmin(req, res);
-  if (!admin) return;
-
-  if (IS_SERVERLESS) {
-    return res.status(503).json({
-      error: "Ambiente serverless detectado. Execute o scraper localmente:",
-      cli: "npx tsx scripts/scrape-competitors.ts --period-start YYYY-MM-DD --period-end YYYY-MM-DD",
-    });
-  }
+  const adminUser = await requireAdmin(req, res);
+  if (!adminUser) return;
 
   if (DEMO_MODE) {
     return res.status(503).json({
-      error: "Firebase não configurado (modo demo). Configure .env para usar o scraper.",
+      error: "Firebase não configurado. Configure .env para enfileirar coletas na VPS.",
     });
   }
 
   const {
-    // single date mode
     checkin,
     checkout,
-    // period mode
     periodStart,
     periodEnd,
     step,
     weekendsOnly,
-    // common
     hotel,
-    adults,
+    hotels,
+    adults = "both",
   } = req.body as {
     checkin?: string;
     checkout?: string;
@@ -66,12 +42,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     step?: number;
     weekendsOnly?: boolean;
     hotel?: string;
-    adults?: number | "both";
+    hotels?: string[];
+    adults?: 1 | 2 | "both";
   };
 
-  // Validate: must have either single or period
-  const isSingle = checkin && checkout;
-  const isPeriod = periodStart && periodEnd;
+  const isSingle = !!(checkin && checkout);
+  const isPeriod = !!(periodStart && periodEnd);
 
   if (!isSingle && !isPeriod) {
     return res.status(400).json({
@@ -85,59 +61,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Formato de data inválido. Use YYYY-MM-DD" });
   }
 
-  // Build CLI args
-  const scriptPath = path.join(process.cwd(), "scripts", "scrape-competitors.ts");
-  const cliArgs: string[] = ["tsx", scriptPath];
+  const hotelIds = [
+    ...(hotel ? [hotel] : []),
+    ...(Array.isArray(hotels) ? hotels.filter(Boolean) : []),
+  ];
+  const uniqueHotelIds = [...new Set(hotelIds)];
 
-  if (isSingle) {
-    cliArgs.push("--checkin", checkin!, "--checkout", checkout!);
-  } else {
-    cliArgs.push("--period-start", periodStart!, "--period-end", periodEnd!);
-    if (step && step > 1) cliArgs.push("--step", String(step));
-    if (weekendsOnly) cliArgs.push("--weekends-only");
-  }
-
-  if (hotel) cliArgs.push("--hotel", hotel);
-  if (adults) cliArgs.push("--adults", adults === "both" ? "both" : String(adults));
-
-  // Stream NDJSON back to client
-  res.setHeader("Content-Type", "application/x-ndjson");
-  res.setHeader("X-Job-Id", `scrape-${Date.now()}`);
-  res.flushHeaders();
-
-  const write = (obj: Record<string, unknown>) => {
-    if (!res.writableEnded) res.write(JSON.stringify(obj) + "\n");
+  const params: ScrapeJobParams = {
+    mode: isSingle ? "single" : "period",
+    checkin,
+    checkout,
+    periodStart,
+    periodEnd,
+    step: step && step > 1 ? Number(step) : 1,
+    weekendsOnly: !!weekendsOnly,
+    hotelIds: uniqueHotelIds,
+    adults: adults === 1 || adults === 2 ? adults : "both",
   };
 
-  write({
-    type: "start",
-    mode: isSingle ? "single" : "period",
-    ...(isSingle ? { checkin, checkout } : { periodStart, periodEnd, step: step ?? 1, weekendsOnly: !!weekendsOnly }),
-    hotel: hotel ?? "all",
-    startedAt: new Date().toISOString(),
-  });
+  const workload = estimateScrapeWorkload(params);
+  const now = new Date().toISOString();
+  const db = getAdminFirestore();
+  const ref = db.collection("scrape_jobs").doc();
 
-  const child = spawn("npx", cliArgs, {
-    cwd: process.cwd(),
-    env: { ...process.env },
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  const job: ScrapeJob = {
+    id: ref.id,
+    status: "pending",
+    params,
+    ...workload,
+    progressPercent: 0,
+    logs: [
+      "Fila criada — aguardando o bot iniciar...",
+      `Tempo estimado de trabalho do bot: ~${workload.estimatedMinutesMin}–${workload.estimatedMinutesMax} min (${workload.estimatedDates} datas × ${workload.estimatedHotels} hotéis).`,
+      "Resultados são liberados hotel a hotel conforme a coleta avança.",
+    ],
+    triggeredBy: adminUser.email || adminUser.uid,
+    createdAt: now,
+    updatedAt: now,
+  };
 
-  child.stdout.on("data", (chunk: Buffer) => {
-    chunk.toString().split("\n").filter(Boolean).forEach((line) => write({ type: "log", line }));
-  });
+  await ref.set(job);
 
-  child.stderr.on("data", (chunk: Buffer) => {
-    chunk.toString().split("\n").filter(Boolean).forEach((line) => write({ type: "error", line }));
-  });
-
-  child.on("close", (code) => {
-    write({ type: "done", exitCode: code, success: code === 0, finishedAt: new Date().toISOString() });
-    res.end();
-  });
-
-  child.on("error", (err) => {
-    write({ type: "error", line: err.message });
-    res.end();
+  return res.status(202).json({
+    jobId: job.id,
+    job,
+    message: "Coleta enfileirada na VPS",
   });
 }

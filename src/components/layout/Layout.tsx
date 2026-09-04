@@ -7,6 +7,11 @@ import {
   TrendingUp,
   LogOut,
   ChevronRight,
+  Calculator,
+  Sparkles,
+  HelpCircle,
+  BarChart3,
+  Scale,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AllureLogo } from "@/components/brand/AllureLogo";
@@ -25,6 +30,26 @@ const navItems = [
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    href: "/racional",
+    label: "Racional",
+    icon: HelpCircle,
+  },
+  {
+    href: "/calculadora",
+    label: "Calculadora",
+    icon: Calculator,
+  },
+  {
+    href: "/auditoria",
+    label: "Auditoria",
+    icon: BarChart3,
+  },
+  {
+    href: "/eventos",
+    label: "Eventos",
+    icon: Sparkles,
   },
   {
     href: "/calendario",

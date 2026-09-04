@@ -1,8 +1,19 @@
+/**
+ * GET /api/competitors — list samples
+ * POST /api/competitors — manual sample (admin)
+ *
+ * History is ordered by run time (scrapedAt / createdAt), not by stay period.
+ */
+
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getSessionUser, requireAdmin } from "@/lib/session";
 import { getAdminFirestore } from "@/lib/firebase-admin";
 import { COMPETITOR_SAMPLES } from "@/data/competitors";
 import type { CompetitorSample } from "@/types";
+
+function runTimestamp(s: Pick<CompetitorSample, "scrapedAt" | "createdAt" | "date">): string {
+  return s.scrapedAt || s.createdAt || `${s.date}T00:00:00.000Z`;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getSessionUser(req);
@@ -19,23 +30,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "GET") {
     try {
-      const snap = await db
-        .collection("competitor_samples")
-        .orderBy("date", "desc")
-        .limit(50)
-        .get();
+      let firestoreSamples: CompetitorSample[] = [];
+      try {
+        const snap = await db.collection("competitor_samples").orderBy("createdAt", "desc").limit(150).get();
+        firestoreSamples = snap.docs.map((d) => ({
+          ...(d.data() as Omit<CompetitorSample, "id">),
+          id: d.id,
+        }));
+      } catch {
+        const snap = await db.collection("competitor_samples").limit(200).get();
+        firestoreSamples = snap.docs.map((d) => ({
+          ...(d.data() as Omit<CompetitorSample, "id">),
+          id: d.id,
+        }));
+      }
 
-      const firestoreSamples: CompetitorSample[] = snap.docs.map((d) => ({
-        ...(d.data() as Omit<CompetitorSample, "id">),
-        id: d.id,
-      }));
+      firestoreSamples.sort((a, b) => runTimestamp(b).localeCompare(runTimestamp(a)));
 
-      // Merge with static data (firestore takes precedence)
-      const firestoreIds = new Set(firestoreSamples.map((s) => s.date));
-      const staticSamples = COMPETITOR_SAMPLES.filter((s) => !firestoreIds.has(s.date));
-      const all = [...firestoreSamples, ...staticSamples].sort((a, b) =>
-        b.date.localeCompare(a.date)
-      );
+      // Keep static demo rows only when that stay-date has no Firestore sample at all
+      const firestoreDates = new Set(firestoreSamples.map((s) => s.date));
+      const staticSamples = COMPETITOR_SAMPLES.filter((s) => !firestoreDates.has(s.date));
+
+      const all = [...firestoreSamples, ...staticSamples]
+        .sort((a, b) => runTimestamp(b).localeCompare(runTimestamp(a)))
+        .slice(0, 100);
 
       return res.status(200).json({ samples: all });
     } catch {

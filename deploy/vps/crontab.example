@@ -1,0 +1,15 @@
+# =============================================================================
+# ALLURE PRICING (Projeto Y) — cole no crontab do host
+# NÃO misturar com crons do Nyo Experts Hub (Projeto X).
+# Instalar: crontab -e  → colar só este bloco
+# =============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# --- allure-pricing: scraper Booking (03:00 BRT ≈ 06:00 UTC; ajuste TZ se necessário) ---
+0 6 * * * cd /opt/allure-pricing/deploy/vps && /usr/bin/docker compose --profile allure run --rm allure-scraper tsx scripts/vps-scraper-runner.ts --period-days 30 --step 2 >> /var/log/allure-scraper.log 2>&1
+
+# --- allure-pricing: sync tarifas Desbravador via app (06:00 BRT ≈ 09:00 UTC) ---
+# Só efetiva se o toggle estiver ligado em Configurações → Integrações.
+0 9 * * * . /opt/allure-pricing/deploy/vps/.env && curl -fsS -X POST -H "Authorization: Bearer ${CRON_SECRET}" "${ALLURE_APP_URL}/api/cron/sync-rates" >> /var/log/allure-desbravador.log 2>&1

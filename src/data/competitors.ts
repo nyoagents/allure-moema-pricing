@@ -1,10 +1,12 @@
 import type { CompetitorSample, CompetitorUrl } from "@/types";
 
 /**
- * 19 unique competitor hotels monitored on Booking.com.
- * URLs are canonical (label/sid params stripped).
+ * Competitor hotels monitored on Booking.com.
+ * URLs are canonical (label/sid/checkin params stripped).
+ * Includes Moema/Ibirapuera set + Berrini/Morumbi/Nações Unidas set (Gabriel Soier, set/2026).
  */
 export const COMPETITOR_URLS: CompetitorUrl[] = [
+  // ── Moema / Ibirapuera ──
   {
     id: "charlie-for-you-moema",
     name: "Charlie For You Moema",
@@ -33,12 +35,6 @@ export const COMPETITOR_URLS: CompetitorUrl[] = [
     id: "slaviero-moema",
     name: "Slaviero Moema SP",
     bookingUrl: "https://www.booking.com/hotel/br/slaviero-moema-sao-paulo-09.pt-br.html",
-    active: true,
-  },
-  {
-    id: "premium-flats-berrini",
-    name: "Premium Flats Berrini",
-    bookingUrl: "https://www.booking.com/hotel/br/premium-flats-berrini.pt-br.html",
     active: true,
   },
   {
@@ -117,6 +113,152 @@ export const COMPETITOR_URLS: CompetitorUrl[] = [
     id: "goodstay",
     name: "Goodstay",
     bookingUrl: "https://www.booking.com/hotel/br/goodstay.pt-br.html",
+    active: true,
+  },
+
+  // ── Berrini / Morumbi / Nações Unidas (lista Gabriel Soier — set/2026) ──
+  {
+    id: "blue-tree-premium-morumbi",
+    name: "Blue Tree Premium Morumbi",
+    bookingUrl: "https://www.booking.com/hotel/br/blue-tree-premium-morumbi.pt-br.html",
+    active: true,
+  },
+  {
+    id: "novotel-sao-paulo-berrini",
+    name: "Novotel São Paulo Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/novotel-sao-paulo-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "grand-hyatt-sao-paulo",
+    name: "Grand Hyatt São Paulo",
+    bookingUrl: "https://www.booking.com/hotel/br/grand-hyatt-sao-paulo.pt-br.html",
+    active: true,
+  },
+  {
+    id: "melia-nacoes-unidas",
+    name: "Meliá São Paulo Nações Unidas",
+    bookingUrl: "https://www.booking.com/hotel/br/sao-paulo-nacoes-unidas-hotel-by-melia.pt-br.html",
+    active: true,
+  },
+  {
+    id: "apartments-nacoes-unidas",
+    name: "Apartments São Paulo Nações Unidas",
+    bookingUrl: "https://www.booking.com/hotel/br/apartments-sao-paulo-nacoes-unidas.pt-br.html",
+    active: true,
+  },
+  {
+    id: "blue-tree-premium-verbo-divino",
+    name: "Blue Tree Premium Verbo Divino",
+    bookingUrl: "https://www.booking.com/hotel/br/blue-tree-premium-verbo-divino.pt-br.html",
+    active: true,
+  },
+  {
+    id: "golden-tower-express-nacoes-unidas",
+    name: "Golden Tower Express Nações Unidas",
+    bookingUrl: "https://www.booking.com/hotel/br/golden-tower-express-nacoes-unidas.pt-br.html",
+    active: true,
+  },
+  {
+    id: "wyndham-sao-paulo-berrini",
+    name: "Wyndham São Paulo Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/wyndham-sao-paulo-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "intercity-premium-berrini",
+    name: "Intercity Premium Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/intercity-premium-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "transamerica-berrini",
+    name: "Transamérica Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/hotel-transamerica-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "premium-flats-berrini",
+    name: "Premium Flats Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/premium-flats-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "transamerica-flat-nacoes-unidas",
+    name: "Transamérica Flat Nações Unidas",
+    bookingUrl: "https://www.booking.com/hotel/br/transamerica-flat-nacoes-unidas.pt-br.html",
+    active: true,
+  },
+  {
+    id: "jw-marriott-sao-paulo",
+    name: "JW Marriott Hotel São Paulo",
+    bookingUrl: "https://www.booking.com/hotel/br/jw-marriott-hotel-sao-paulo.pt-br.html",
+    active: true,
+  },
+  {
+    id: "extension-berrini",
+    name: "Extension Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/extension-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "intercity-premium-nacoes-unidas",
+    name: "Intercity Premium Nações Unidas",
+    bookingUrl: "https://www.booking.com/hotel/br/intercity-premium-nacoes-unidas.pt-br.html",
+    active: true,
+  },
+  {
+    id: "ibis-sao-paulo-morumbi",
+    name: "ibis São Paulo Morumbi",
+    bookingUrl: "https://www.booking.com/hotel/br/ibis-sao-paulo-morumbi.pt-br.html",
+    active: true,
+  },
+  {
+    id: "hilton-sao-paulo-morumbi",
+    name: "Hilton São Paulo Morumbi",
+    bookingUrl: "https://www.booking.com/hotel/br/hilton-sao-paulo-morumbi.pt-br.html",
+    active: true,
+  },
+  {
+    id: "gran-estanplaza-berrini",
+    name: "Gran Estanplaza Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/gran-estanplaza-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "sao-paulo-wtc",
+    name: "São Paulo WTC",
+    bookingUrl: "https://www.booking.com/hotel/br/sao-paulo-wtc.pt-br.html",
+    active: true,
+  },
+  {
+    id: "the-time-othon-flat",
+    name: "The Time Othon Flat",
+    bookingUrl: "https://www.booking.com/hotel/br/the-time-othon-flat.pt-br.html",
+    active: true,
+  },
+  {
+    id: "estanplaza-berrini",
+    name: "Estanplaza Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/estanplaza-berrini-sao-paulo.pt-br.html",
+    active: true,
+  },
+  {
+    id: "mercure-sao-paulo-berrini",
+    name: "Mercure São Paulo Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/sao-paulo-berrini.pt-br.html",
+    active: true,
+  },
+  {
+    id: "estanplaza-nacoes-unidas",
+    name: "Estanplaza Nações Unidas",
+    bookingUrl: "https://www.booking.com/hotel/br/estanplaza-nacoes-unidas.pt-br.html",
+    active: true,
+  },
+  {
+    id: "park-inn-berrini",
+    name: "Park Inn Berrini",
+    bookingUrl: "https://www.booking.com/hotel/br/park-inn-berrini.pt-br.html",
     active: true,
   },
 ];

@@ -1,0 +1,41 @@
+# Isolado: só Projeto Y (Allure). Não compartilhar network/volumes com nyo-kpi-warm.
+services:
+  # One-shot / cron: docker compose --profile allure run --rm allure-scraper ...
+  allure-scraper:
+    build:
+      context: ../..
+      dockerfile: deploy/vps/Dockerfile
+    image: allure-scraper:latest
+    container_name: allure-scraper
+    working_dir: /app
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    profiles:
+      - allure
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  # Always-on: processa fila scrape_jobs criada pela UI (localhost/Vercel)
+  allure-scraper-worker:
+    image: allure-scraper:latest
+    container_name: allure-scraper-worker
+    working_dir: /app
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      SCRAPE_WORKER_POLL_MS: "10000"
+    command: ["tsx", "scripts/scrape-job-worker.ts"]
+    restart: unless-stopped
+    profiles:
+      - allure
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"

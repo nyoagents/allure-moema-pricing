@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import Layout from "@/components/layout/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import type { PricingResult } from "@/types";
@@ -220,14 +221,14 @@ export default function DashboardPage() {
               Atualizar
             </button>
 
-            <button
-              onClick={() => { setSimOpen(true); setSimResult(null); }}
+            <Link
+              href="/calculadora"
               className="btn btn-gold"
-              style={{ gap: 6, padding: "6px 14px", fontSize: 13 }}
+              style={{ gap: 6, padding: "6px 14px", fontSize: 13, textDecoration: "none" }}
             >
               <Calculator size={14} />
-              Simulação
-            </button>
+              Calculadora
+            </Link>
           </div>
         }
       >
@@ -342,22 +343,23 @@ export default function DashboardPage() {
                   height: 8,
                   borderRadius: "50%",
                   background:
-                    mainPricing[0]?.barSource === "firestore" ? "#1f9d55" :
-                    mainPricing[0]?.barSource === "historical" ? "var(--gold)" : "var(--mid)",
+                    mainPricing[0]?.barSource === "event" ? "#d97706" :
+                    mainPricing[0]?.barSource === "manual" ? "#1f9d55" :
+                    "var(--gold)",
                 }}
               />
-              {mainPricing[0]?.barSource === "firestore"
-                ? "Configurado"
-                : mainPricing[0]?.barSource === "historical"
-                ? "Histórico"
-                : "Padrão"}
+              {mainPricing[0]?.barSource === "event"
+                ? "Evento"
+                : mainPricing[0]?.barSource === "manual"
+                ? "Ajuste Manual"
+                : "Histórico Sazonal"}
             </div>
             <div className="stat-sub">
-              {mainPricing[0]?.barSource === "firestore"
-                ? "Período manual"
-                : mainPricing[0]?.barSource === "historical"
-                ? "Calendário 2023-2024"
-                : "BAR 5 default"}
+              {mainPricing[0]?.barSource === "event"
+                ? "Pressão tarifária"
+                : mainPricing[0]?.barSource === "manual"
+                ? "Definido pelo usuário"
+                : "Calibração de sazonalidade"}
             </div>
           </div>
 
